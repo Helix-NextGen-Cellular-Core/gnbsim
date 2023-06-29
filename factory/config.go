@@ -19,6 +19,8 @@ import (
 	"github.com/omec-project/gnbsim/common"
 	gnbctx "github.com/omec-project/gnbsim/gnodeb/context"
 	profctx "github.com/omec-project/gnbsim/profile/context"
+
+	"sort"
 )
 
 const (
@@ -105,10 +107,13 @@ func (c *Config) Validate() (err error) {
 		return fmt.Errorf("no profile information available")
 	}
 
+	keys := make([]int, 0, len(c.Configuration.CustomProfiles))
 	if len(c.Configuration.CustomProfiles) != 0 {
-		for _, v := range c.Configuration.CustomProfiles {
+		for key, v := range c.Configuration.CustomProfiles {
 			it := v.Iterations
 			v.PIterations = make(map[string]*profctx.PIterations)
+			numKey, _ := strconv.Atoi(key[14:])
+			keys = append(keys, numKey)
 			for _, v1 := range it {
 				if len(v1.Next) == 0 {
 					v1.Next = "quit" // default value
@@ -156,10 +161,17 @@ func (c *Config) Validate() (err error) {
 			}
 		}
 
-		for _, v := range c.Configuration.CustomProfiles {
-			c.Configuration.Profiles = append(c.Configuration.Profiles, v)
-		}
-	}
+		sort.Ints(keys)
+		 
+		for _, v := range keys {
+		   c.Configuration.Profiles = append(c.Configuration.Profiles, 
+			  c.Configuration.CustomProfiles["customProfiles" + strconv.Itoa(v)])
+	   }
+
+	//    for _, v := range c.Configuration.CustomProfiles {
+	//    	c.Configuration.Profiles = append(c.Configuration.Profiles, v)
+	//    }
+   }
 
 	return nil
 }
