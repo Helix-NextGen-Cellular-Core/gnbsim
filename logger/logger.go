@@ -13,7 +13,7 @@ import (
 	formatter "github.com/antonfisher/nested-logrus-formatter"
 	"github.com/omec-project/logger_util"
 	"github.com/sirupsen/logrus"
-	// "io/ioutil"
+	"io/ioutil"
 )
 
 var (

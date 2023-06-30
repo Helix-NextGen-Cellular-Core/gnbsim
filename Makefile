@@ -2,15 +2,17 @@
 # Copyright 2021 Open Networking Foundation
 # Copyright 2022 Intel Corporation
 #
+export GOPATH=/home/aether/go/
 
 PROJECT_NAME             := gnbSim
 DOCKER_VERSION                  ?= $(shell cat ./VERSION)
 
 ## Docker related
 DOCKER_REGISTRY          ?=
-DOCKER_REPOSITORY        ?=
-DOCKER_TAG               ?= ${DOCKER_VERSION}
-DOCKER_IMAGENAME         := ${DOCKER_REGISTRY}${DOCKER_REPOSITORY}${PROJECT_NAME}:${DOCKER_TAG}
+DOCKER_REPOSITORY        ?= 
+# DOCKER_TAG               ?= 1milisecdelay #${DOCKER_VERSION}
+DOCKER_TAG               ?= 1secdelay #${DOCKER_VERSION}
+DOCKER_IMAGENAME         := ${echo $DOCKER_REGISTRY}${DOCKER_REPOSITORY}${PROJECT_NAME}:${DOCKER_TAG}
 DOCKER_BUILDKIT          ?= 1
 DOCKER_BUILD_ARGS        ?=
 
@@ -41,6 +43,7 @@ docker-build:
 
 docker-push:
 	for target in $(DOCKER_TARGETS); do \
+		echo ${DOCKER_REGISTRY}${DOCKER_REPOSITORY}5gc-$$target:${DOCKER_TAG};
 		docker push ${DOCKER_REGISTRY}${DOCKER_REPOSITORY}5gc-$$target:${DOCKER_TAG}; \
 	done
 

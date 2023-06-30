@@ -206,7 +206,7 @@ func ImsiStateMachine(profile *profctx.Profile, pCtx *profctx.ProfileUeContext, 
 			case common.PROC_PASS_EVENT:
 				end_ts := time.Now()
 				diff := end_ts.Sub(start_ts)
-				fmt.Printf("[LOG][E2E],%v,%v,%v,%v,%v,%v,pass\n", msg.Supi, start_ts.UnixNano(), end_ts.UnixNano(), diff.Milliseconds(),end_ts.Format("15:04:05"), procedure)
+				fmt.Printf("[LOG][E2E],%v,%v,%v,%v,%v,%v,%v,%v,pass\n", msg.Supi,start_ts.Unix(),end_ts.Unix(), start_ts.UnixNano(), end_ts.UnixNano(), diff.Milliseconds(),end_ts.Format("15:04:05"), procedure)
 				time.Sleep(1 * time.Millisecond)
 			
 				pCtx.Log.Infoln("Procedure Result: PASS, imsi:", msg.Supi)
@@ -217,7 +217,7 @@ func ImsiStateMachine(profile *profctx.Profile, pCtx *profctx.ProfileUeContext, 
 			case common.PROC_FAIL_EVENT:
 				end_ts := time.Now()
 				diff := end_ts.Sub(start_ts)
-				fmt.Printf("[LOG][E2E],%v,%v,%v,%v,%v,%v,fail\n", msg.Supi, start_ts.UnixNano(), end_ts.UnixNano(), diff.Milliseconds(), end_ts.Format("15:04:05"), procedure)
+				fmt.Printf("[LOG][E2E],%v,%v,%v,%v,%v,%v,%v,%v,fail\n", msg.Supi,start_ts.Unix(),end_ts.Unix(), start_ts.UnixNano(), end_ts.UnixNano(), diff.Milliseconds(),end_ts.Format("15:04:05"), procedure)
 				time.Sleep(1 * time.Millisecond)
  
 				err = fmt.Errorf("imsi:%v, procedure:%v, error:%v", msg.Supi, msg.Proc, msg.Error)
