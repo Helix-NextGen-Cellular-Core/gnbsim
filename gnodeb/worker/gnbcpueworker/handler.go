@@ -8,7 +8,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"sync"
-	"time"
+	// "time"
 
 	"github.com/omec-project/gnbsim/common"
 	gnbctx "github.com/omec-project/gnbsim/gnodeb/context"
@@ -593,7 +593,7 @@ func ProcessPduSessResourceSetupList(gnbue *gnbctx.GnbCpUe,
 	/* TODO: To be fixed, currently Data Bearer Setup Event may get processed
 	 * before the pdu sessions are established on the UE side
 	 */
-	time.Sleep(500 * time.Millisecond)
+	// time.Sleep(500 * time.Millisecond)
 	uemsg := common.UuMessage{}
 	uemsg.Event = common.DATA_BEARER_SETUP_REQUEST_EVENT
 	uemsg.DBParams = dbParamSet

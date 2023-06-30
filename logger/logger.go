@@ -50,7 +50,7 @@ func init() {
 	summaryLog = logrus.New()
 	log.SetReportCaller(false)
 	summaryLog.SetReportCaller(false)
-	//log.SetOutput(ioutil.Discard)
+	log.SetOutput(ioutil.Discard)
 
 	log.Formatter = &formatter.Formatter{
 		TimestampFormat: time.RFC3339,
