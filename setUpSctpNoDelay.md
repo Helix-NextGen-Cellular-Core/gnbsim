@@ -5,5 +5,5 @@ In the following file in go folder
 before 
 _, err = SCTPConnect(sock, raddr)
 add 
-// err = syscall.SetsockoptInt(sock, SOL_SCTP, SCTP_NODELAY, 1)
+err = syscall.SetsockoptInt(sock, SOL_SCTP, SCTP_NODELAY, 1)
 this line
