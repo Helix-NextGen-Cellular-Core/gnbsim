@@ -165,7 +165,7 @@ func HandleInitialContextSetupRequest(gnbue *gnbctx.GnbCpUe,
 		}
 	}
 
-	if nasPdu.Value != nil {
+	if nasPdu != nil && nasPdu.Value != nil {
 		var pdus common.NasPduList
 		pdus = append(pdus, nasPdu.Value)
 		SendToUe(gnbue, common.DL_INFO_TRANSFER_EVENT, pdus)
@@ -310,7 +310,7 @@ func HandlePduSessResourceReleaseCommand(gnbue *gnbctx.GnbCpUe,
 		gnbue.RemoveGnbUpUe(pduSessId)
 	}
 
-	if nasPdu.Value != nil {
+	if nasPdu != nil && nasPdu.Value != nil {
 		var pdus common.NasPduList
 		pdus = append(pdus, nasPdu.Value)
 		SendToUe(gnbue, common.DL_INFO_TRANSFER_EVENT, pdus)
@@ -342,6 +342,7 @@ func HandleDataBearerSetupResponse(gnbue *gnbctx.GnbCpUe,
 	for _, item := range msg.DBParams {
 		pduSess := item.PduSess
 		if !pduSess.Success {
+			fmt.Println("pduSess.Success ", pduSess.PduSessId, pduSess.Success, "removing from gnbue\n")
 			gnbue.RemoveGnbUpUe(pduSess.PduSessId)
 		} else {
 			gnbUpUe, err := gnbue.GetGnbUpUe(pduSess.PduSessId)
@@ -351,13 +352,18 @@ func HandleDataBearerSetupResponse(gnbue *gnbctx.GnbCpUe,
 			// TODO: Addition to this map should only be through GnbUpfWorker
 			// routine. This will help in replacing sync map with normal map
 			// Thus will help avoid lock unlock operation on per downlink message
-			gnbUpUe.Upf.GnbUpUes.AddGnbUpUe(gnbUpUe.DlTeid, true, gnbUpUe)
-			gnbUpUe.WriteUeChan = item.CommChan
-			gnbue.WaitGrp.Add(1)
-			go func() {
-				defer gnbue.WaitGrp.Done()
-				gnbupueworker.Init(gnbUpUe)
-			}()
+			// fmt.Println("gnbUpUe %v\n", gnbUpUe)
+			if gnbUpUe != nil {
+				// fmt.Println("pduSess.PduSessId %v gnbUpUe %v \n", pduSess.PduSessId, gnbUpUe)
+				// fmt.Println("gnbUpUe.DlTeid %v \n", gnbUpUe.DlTeid)
+				gnbUpUe.Upf.GnbUpUes.AddGnbUpUe(gnbUpUe.DlTeid, true, gnbUpUe)
+				gnbUpUe.WriteUeChan = item.CommChan
+				gnbue.WaitGrp.Add(1)
+				go func() {
+					defer gnbue.WaitGrp.Done()
+					gnbupueworker.Init(gnbUpUe)
+				}()
+			}
 		}
 		pduSessions = append(pduSessions, pduSess)
 	}

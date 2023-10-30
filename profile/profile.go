@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/omec-project/gnbsim/common"
 	"github.com/omec-project/gnbsim/factory"
@@ -124,6 +125,24 @@ func ExecuteProfile(profile *profctx.Profile, summaryChan chan common.InterfaceM
 	defer func() {
 		summaryChan <- summary
 	}()
+
+	// startingTime := time.Now().Add(1 * time.Minute)
+	// time.Sleep(startingTime.Sub(time.Now()))
+
+	var currentTime = time.Now()
+	var startTime = currentTime.Truncate(time.Minute).Add(time.Minute)
+	var duration = startTime.Sub(currentTime)
+	if duration.Round(time.Second).Seconds() <= 2 {
+		time.Sleep(time.Second * 5)
+		currentTime = time.Now()
+		startTime = currentTime.Truncate(time.Minute).Add(time.Minute)
+		duration = startTime.Sub(currentTime)
+	}
+
+	fmt.Printf("Current: \t%v\nStartAt: \t%v\n", currentTime, startTime)
+	fmt.Printf("Sleeping for %v\n", duration.Round(time.Second).Seconds())
+
+	time.Sleep(duration)
 
 	go func() {
 		var plock sync.Mutex
