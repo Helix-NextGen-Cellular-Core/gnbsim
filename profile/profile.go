@@ -187,6 +187,8 @@ func ExecuteProfile(profile *profctx.Profile, summaryChan chan common.InterfaceM
 	}()
 	imsi := profile.Imsi
 	for count := 1; count <= profile.UeCount; count++ {
+		time.Sleep(time.Second * 2)
+		// time.Sleep(time.Millisecond * 500)
 		imsiStr := "imsi-" + strconv.Itoa(imsi)
 		imsi++
 		wg.Add(1)
