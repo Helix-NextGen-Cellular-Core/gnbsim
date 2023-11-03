@@ -7,13 +7,13 @@
 package logger
 
 import (
+	"io/ioutil"
 	"os"
 	"time"
 
 	formatter "github.com/antonfisher/nested-logrus-formatter"
 	"github.com/omec-project/logger_util"
 	"github.com/sirupsen/logrus"
-	"io/ioutil"
 )
 
 var (
