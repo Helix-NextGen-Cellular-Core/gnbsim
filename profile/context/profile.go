@@ -6,8 +6,13 @@
 package context
 
 import (
+	"encoding/csv"
 	"fmt"
 	"log"
+	"math/rand"
+	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/omec-project/gnbsim/common"
@@ -27,12 +32,24 @@ type ProcedureEventsDetails struct {
 var ProceduresMap map[common.ProcedureType]*ProcedureEventsDetails
 var ProfileMap map[string]*Profile
 
+type DelayDist struct {
+	Type   string // CSV
+	File   string // filename
+	Random bool   // RAND
+}
+
 type PIterations struct {
-	Name    string
-	ProcMap map[int]common.ProcedureType
-	WaitMap map[int]int
-	NextItr string
-	Repeat  int
+	// Name    string
+	// ProcMap map[int]common.ProcedureType
+	// WaitMap map[int]int
+	// NextItr string
+	// Repeat  int
+	Name        string
+	ProcMap     map[int]common.ProcedureType
+	WaitMap     map[int]int
+	WaitDistMap map[int]*DelayDist
+	NextItr     string
+	Repeat      int
 }
 
 type Iterations struct {
@@ -100,6 +117,64 @@ type Profile struct {
 func init() {
 	ProceduresMap = make(map[common.ProcedureType]*ProcedureEventsDetails)
 	ProfileMap = make(map[string]*Profile)
+
+	load_csv_var()
+}
+
+var srvreq_delays []Delay
+var s1release_delays []Delay
+
+func read_csv_file(file string) []Delay {
+	fmt.Println(" in read_csv_file() local logic of sleep time..", file)
+
+	f, err := os.Open(file)
+	if err != nil {
+		fmt.Println("Cannot open CSV file:", err)
+	}
+	defer f.Close()
+
+	reader := csv.NewReader(f)
+	rows, err := reader.ReadAll()
+	if err != nil {
+		fmt.Println("Cannot read CSV file:", err)
+	}
+	var delays []Delay
+
+	for _, row := range rows {
+		val, _ := strconv.ParseFloat(row[0], 32)
+		del := Delay{
+			value: int(val),
+		}
+		delays = append(delays, del)
+	}
+
+	return delays
+}
+
+func load_csv_var() {
+	srvreq_csv_file := "/root/ECM_IDLE-L_SRV_REQ.csv"
+	s1release_csv_file := "/root/ECM_CONNECTED-L_S1_CONN_REL.csv"
+
+	srvreq_delays = read_csv_file(srvreq_csv_file)
+	s1release_delays = read_csv_file(s1release_csv_file)
+}
+
+// "3": "USER-DATA-PACKET-GENERATION-PROCEDURE delay='CSV,<path>/PDU-SESS-IAT.CSV,RAND'"
+// "2": "PDU-SESSION-ESTABLISHMENT-PROCEDURE 5"
+func (iter *PIterations) SetIterationParam(num int, data []string) {
+	iter.ProcMap[num] = common.GetProcId(data[0])
+	x, err := strconv.Atoi(data[1])
+	if err == nil {
+		iter.WaitMap[num] = x
+	} else {
+		iter.WaitMap[num] = 0
+		f := strings.Split(data[1], ",")
+		fmt.Println("data[1] ", data[1])
+		fmt.Println("f ", f)
+		d := &DelayDist{Type: "CSV", File: f[1], Random: true}
+		iter.WaitDistMap[num] = d
+		fmt.Printf("Delay dist %v ", d)
+	}
 }
 
 func (profile *Profile) Init() {
@@ -156,6 +231,55 @@ func SendAddNewCallsEventProfile(name string, number int32) error {
 		profile.Log.Traceln("profile ", profile, ", writing on trig channel - end")
 	}
 	return nil
+}
+
+type Delay struct {
+	value int
+}
+
+// type files_rec struct {
+
+// }
+
+func delayFunction(file string, t string, rand_bool bool) { // filename, "CSV", true
+	// fmt.Println("local logic of sleep time..", file, t, rand_bool)
+
+	// f, err := os.Open(file)
+	// if err != nil {
+	// 	fmt.Println("Cannot open CSV file:", err)
+	// }
+	// defer f.Close()
+
+	// reader := csv.NewReader(f)
+	// rows, err := reader.ReadAll()
+	// if err != nil {
+	// 	fmt.Println("Cannot read CSV file:", err)
+	// }
+	// var delays []Delay
+	// for _, row := range rows {
+	//   val, _ := strconv.ParseFloat(row[0], 32)
+	//   del := Delay{
+	// 	value: int(val),
+	//   }
+	//   delays = append(delays, del)
+	// }
+	// fmt.Println(delays)
+
+	var delays []Delay
+	if strings.Contains(file, "S1_CONN_REL") {
+		delays = s1release_delays
+	}
+	if strings.Contains(file, "SRV_REQ") {
+		delays = srvreq_delays
+	}
+
+	len := len(delays)
+	fmt.Printf("len of delays: %v, type: %t\n", len, len)
+	rand.Seed(41)
+	idx := rand.Intn(len)
+	delay_val := delays[idx].value
+	fmt.Printf("delay idx: %v, value: %v sec, type: %t\n", idx, delay_val, delay_val)
+	time.Sleep(time.Duration(delay_val) * time.Millisecond)
 }
 
 func (p *Profile) GetNextEvent(Procedure common.ProcedureType, currentEvent common.EventType) (common.EventType, error) {
@@ -239,6 +363,11 @@ func (p *Profile) GetNextProcedure(pCtx *ProfileUeContext, currentProcedure comm
 		if itp.WaitMap[pCtx.CurrentProcIndex] != 0 {
 			// time.Sleep(time.Second * time.Duration(itp.WaitMap[pCtx.CurrentProcIndex]))
 			time.Sleep(time.Millisecond * time.Duration(itp.WaitMap[pCtx.CurrentProcIndex]))
+		} else if itp.WaitDistMap[pCtx.CurrentProcIndex] != nil {
+			d := itp.WaitDistMap[pCtx.CurrentProcIndex]
+			fmt.Printf("Get delay from configured method %v\n", d)
+			// Now you have d i.e. DelayDist. You have filename..Call function
+			delayFunction(d.File, d.Type, d.Random) // filename, "CSV", true
 		}
 		nextProcIndex := pCtx.CurrentProcIndex + 1
 		nextProcedure, found := itp.ProcMap[nextProcIndex]

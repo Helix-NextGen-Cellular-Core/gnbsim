@@ -121,57 +121,65 @@ func (c *Config) Validate() (err error) {
 				PIter := &profctx.PIterations{Name: v1.Name, NextItr: v1.Next, Repeat: v1.Repeat}
 				PIter.ProcMap = make(map[int]common.ProcedureType)
 				PIter.WaitMap = make(map[int]int)
+				PIter.WaitDistMap = make(map[int]*profctx.DelayDist)
 				PIter.WaitMap[0] = 0
 				if len(v1.First) > 0 {
 					x := strings.Fields(v1.First)
-					PIter.ProcMap[1] = common.GetProcId(x[0])
-					PIter.WaitMap[1], err = strconv.Atoi(x[1])
+					// PIter.ProcMap[1] = common.GetProcId(x[0])
+					// PIter.WaitMap[1], err = strconv.Atoi(x[1])
+					PIter.SetIterationParam(1, x)
 				}
 				if len(v1.Second) > 0 {
 					x := strings.Fields(v1.Second)
-					PIter.ProcMap[2] = common.GetProcId(x[0])
-					PIter.WaitMap[2], err = strconv.Atoi(x[1])
+					// PIter.ProcMap[2] = common.GetProcId(x[0])
+					// PIter.WaitMap[2], err = strconv.Atoi(x[1])
+					PIter.SetIterationParam(2, x)
 				}
 				if len(v1.Third) > 0 {
 					x := strings.Fields(v1.Third)
-					PIter.ProcMap[3] = common.GetProcId(x[0])
-					PIter.WaitMap[3], err = strconv.Atoi(x[1])
+					// PIter.ProcMap[3] = common.GetProcId(x[0])
+					// PIter.WaitMap[3], err = strconv.Atoi(x[1])
+					PIter.SetIterationParam(3, x)
 				}
 				if len(v1.Fourth) > 0 {
 					x := strings.Fields(v1.Fourth)
-					PIter.ProcMap[4] = common.GetProcId(x[0])
-					PIter.WaitMap[4], err = strconv.Atoi(x[1])
+					// PIter.ProcMap[4] = common.GetProcId(x[0])
+					// PIter.WaitMap[4], err = strconv.Atoi(x[1])
+					PIter.SetIterationParam(4, x)
 				}
 				if len(v1.Fifth) > 0 {
 					x := strings.Fields(v1.Fifth)
-					PIter.ProcMap[5] = common.GetProcId(x[0])
-					PIter.WaitMap[5], err = strconv.Atoi(x[1])
+					// PIter.ProcMap[5] = common.GetProcId(x[0])
+					// PIter.WaitMap[5], err = strconv.Atoi(x[1])
+					PIter.SetIterationParam(5, x)
 				}
 				if len(v1.Sixth) > 0 {
 					x := strings.Fields(v1.Sixth)
-					PIter.ProcMap[6] = common.GetProcId(x[0])
-					PIter.WaitMap[6], err = strconv.Atoi(x[1])
+					// PIter.ProcMap[6] = common.GetProcId(x[0])
+					// PIter.WaitMap[6], err = strconv.Atoi(x[1])
+					PIter.SetIterationParam(6, x)
 				}
 				if len(v1.Seventh) > 0 {
 					x := strings.Fields(v1.Seventh)
-					PIter.ProcMap[7] = common.GetProcId(x[0])
-					PIter.WaitMap[7], err = strconv.Atoi(x[1])
+					// PIter.ProcMap[7] = common.GetProcId(x[0])
+					// PIter.WaitMap[7], err = strconv.Atoi(x[1])
+					PIter.SetIterationParam(1, x)
 				}
 				v.PIterations[v1.Name] = PIter // add iterations in the custom profile
 			}
 		}
 
 		sort.Ints(keys)
-		 
-		for _, v := range keys {
-		   c.Configuration.Profiles = append(c.Configuration.Profiles, 
-			  c.Configuration.CustomProfiles["customProfiles" + strconv.Itoa(v)])
-	   }
 
-	//    for _, v := range c.Configuration.CustomProfiles {
-	//    	c.Configuration.Profiles = append(c.Configuration.Profiles, v)
-	//    }
-   }
+		for _, v := range keys {
+			c.Configuration.Profiles = append(c.Configuration.Profiles,
+				c.Configuration.CustomProfiles["customProfiles"+strconv.Itoa(v)])
+		}
+
+		//    for _, v := range c.Configuration.CustomProfiles {
+		//    	c.Configuration.Profiles = append(c.Configuration.Profiles, v)
+		//    }
+	}
 
 	return nil
 }
