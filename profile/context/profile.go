@@ -117,8 +117,7 @@ type Profile struct {
 func init() {
 	ProceduresMap = make(map[common.ProcedureType]*ProcedureEventsDetails)
 	ProfileMap = make(map[string]*Profile)
-
-	load_csv_var()
+	// load_csv_var()
 }
 
 var srvreq_delays []Delay
@@ -151,12 +150,15 @@ func read_csv_file(file string) []Delay {
 	return delays
 }
 
-func load_csv_var() {
-	srvreq_csv_file := "/root/ECM_IDLE-L_SRV_REQ.csv"
-	s1release_csv_file := "/root/ECM_CONNECTED-L_S1_CONN_REL.csv"
-
-	srvreq_delays = read_csv_file(srvreq_csv_file)
-	s1release_delays = read_csv_file(s1release_csv_file)
+func (profile *Profile) Load_csv_vars(srvreq_csv_file, s1release_csv_file string) {
+	// srvreq_csv_file := "/root/ECM_IDLE-L_SRV_REQ.csv"
+	// s1release_csv_file := "/root/ECM_CONNECTED-L_S1_CONN_REL.csv"
+	fmt.Println(" in Load_csv_vars() ..", srvreq_csv_file, s1release_csv_file)
+	if profile.Enable {
+		srvreq_delays = read_csv_file(srvreq_csv_file)
+		s1release_delays = read_csv_file(s1release_csv_file)
+		rand.Seed(41)
+	}
 }
 
 // "3": "USER-DATA-PACKET-GENERATION-PROCEDURE delay='CSV,<path>/PDU-SESS-IAT.CSV,RAND'"
@@ -275,7 +277,6 @@ func delayFunction(file string, t string, rand_bool bool) { // filename, "CSV", 
 
 	len := len(delays)
 	fmt.Printf("len of delays: %v, type: %t\n", len, len)
-	rand.Seed(41)
 	idx := rand.Intn(len)
 	delay_val := delays[idx].value
 	fmt.Printf("delay idx: %v, value: %v sec, type: %t\n", idx, delay_val, delay_val)
@@ -360,12 +361,14 @@ func (p *Profile) GetNextProcedure(pCtx *ProfileUeContext, currentProcedure comm
 		pCtx.Log.Infoln("Current UE procedure index  ", pCtx.CurrentProcIndex)
 		itp, found := p.PIterations[pCtx.CurrentItr]
 		pCtx.Log.Infoln("Current Iteration map - ", itp)
+		// fmt.Println("itp.WaitMap[pCtx.CurrentProcIndex])", itp.WaitMap[pCtx.CurrentProcIndex])
 		if itp.WaitMap[pCtx.CurrentProcIndex] != 0 {
 			// time.Sleep(time.Second * time.Duration(itp.WaitMap[pCtx.CurrentProcIndex]))
+			// fmt.Println("simple Delay", itp.WaitMap[pCtx.CurrentProcIndex])
 			time.Sleep(time.Millisecond * time.Duration(itp.WaitMap[pCtx.CurrentProcIndex]))
 		} else if itp.WaitDistMap[pCtx.CurrentProcIndex] != nil {
 			d := itp.WaitDistMap[pCtx.CurrentProcIndex]
-			fmt.Printf("Get delay from configured method %v\n", d)
+			// fmt.Printf("Get delay from configured method %v\n", d.File, d.Type, d.Random)
 			// Now you have d i.e. DelayDist. You have filename..Call function
 			delayFunction(d.File, d.Type, d.Random) // filename, "CSV", true
 		}

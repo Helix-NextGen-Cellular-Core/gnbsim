@@ -35,6 +35,9 @@ const (
 func InitializeAllProfiles() {
 	for _, profile := range factory.AppConfig.Configuration.Profiles {
 		profile.Init()
+		if factory.AppConfig.Configuration.RealTrace {
+			profile.Load_csv_vars(factory.AppConfig.Configuration.RealTraceFileSR, factory.AppConfig.Configuration.RealTraceFileS1)
+		}
 	}
 	initProcedureEventMap()
 }
@@ -187,7 +190,9 @@ func ExecuteProfile(profile *profctx.Profile, summaryChan chan common.InterfaceM
 	}()
 	imsi := profile.Imsi
 	for count := 1; count <= profile.UeCount; count++ {
-		time.Sleep(time.Second * 2)
+		if !factory.AppConfig.Configuration.StartUeatOnce {
+			time.Sleep(time.Second * time.Duration(factory.AppConfig.Configuration.StartImsiDelay))
+		}
 		// time.Sleep(time.Millisecond * 500)
 		imsiStr := "imsi-" + strconv.Itoa(imsi)
 		imsi++

@@ -213,7 +213,7 @@ func NASDecode(ue *realuectx.RealUe, securityHeaderType uint8, payload []byte) (
 		if !reflect.DeepEqual(mac32, receivedMac32) {
 			fmt.Printf("NAS MAC verification failed(0x%x != 0x%x)\n", mac32, receivedMac32)
 		} else {
-			fmt.Printf("cmac value: 0x%x\n", mac32)
+			// fmt.Printf("cmac value: 0x%x\n", mac32)
 		}
 
 		// remove sequece Number
