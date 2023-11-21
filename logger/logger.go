@@ -7,6 +7,7 @@
 package logger
 
 import (
+	"io"
 	"io/ioutil"
 	"os"
 	"time"
@@ -51,6 +52,7 @@ func init() {
 	log.SetReportCaller(false)
 	summaryLog.SetReportCaller(false)
 	log.SetOutput(ioutil.Discard)
+	log.SetOutput(io.Discard)
 
 	log.Formatter = &formatter.Formatter{
 		TimestampFormat: time.RFC3339,

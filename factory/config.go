@@ -50,6 +50,10 @@ type Configuration struct {
 	RealTrace                bool                        `yaml:"realTrace"`
 	RealTraceFileSR          string                      `yaml:"realTraceFileSR"`
 	RealTraceFileS1          string                      `yaml:"realTraceFileS1"`
+	RealTraceSimulationTime  string                      `yaml:"realTraceSimulationTime"`
+	PauseAtStart             bool                        `yaml:"pauseAtStart"` // if set to true it will not wait at beginning - inverted
+	EventRetry               bool                        `yaml:"eventRetry"`
+	EventRetryTime           int                         `yaml:"eventRetryTime"`
 	Server                   HttpServer                  `yaml:"httpServer"`
 	GoProfile                ProfileServer               `yaml:"goProfile"`
 	RunConfigProfilesAtStart bool                        `yaml:"runConfigProfilesAtStart"`
@@ -84,6 +88,10 @@ func (c *Config) Validate() (err error) {
 	fmt.Printf("c.Configuration.RealTrace", c.Configuration.RealTrace, "\n")
 	fmt.Printf("c.Configuration.RealTraceFileSR", c.Configuration.RealTraceFileSR, "\n")
 	fmt.Printf("c.Configuration.RealTraceFileS1", c.Configuration.RealTraceFileS1, "\n")
+	fmt.Printf("c.Configuration.RealTraceSimulationTime", c.Configuration.RealTraceSimulationTime, "\n")
+	fmt.Printf("c.Configuration.PauseAtStart if set to true it will not wait at beginning - inverted", c.Configuration.PauseAtStart, "\n")
+	fmt.Printf("c.Configuration.EventRetry", c.Configuration.EventRetry, "\n")
+	fmt.Printf("c.Configuration.EventRetryTime", c.Configuration.EventRetryTime, "\n")
 
 	if c.Info == nil {
 		return fmt.Errorf("Info field missing")

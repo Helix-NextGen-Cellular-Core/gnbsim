@@ -6,6 +6,8 @@ package simue
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/omec-project/gnbsim/common"
 	"github.com/omec-project/gnbsim/gnodeb"
 	gnbctx "github.com/omec-project/gnbsim/gnodeb/context"
@@ -13,7 +15,6 @@ import (
 	"github.com/omec-project/gnbsim/profile/util"
 	"github.com/omec-project/gnbsim/realue"
 	simuectx "github.com/omec-project/gnbsim/simue/context"
-	"time"
 )
 
 func InitUE(imsiStr string, gnb *gnbctx.GNodeB, profile *profctx.Profile, result chan *common.ProfileMessage) chan common.InterfaceMessage {
@@ -191,6 +192,12 @@ func ImsiStateMachine(profile *profctx.Profile, pCtx *profctx.ProfileUeContext, 
 		// proc result -  success, fail or timeout
 		timeout := time.Duration(profile.PerUserTimeout) * time.Second
 		ticker := time.NewTicker(timeout)
+		// retryTicker := time.NewTicker(100 * time.Second) // hack if retry is not enabled
+		// retries := 0
+		// if factory.AppConfig.Configuration.EventRetry == true {
+		// 	retryTicker = time.NewTicker(time.Duration(factory.AppConfig.Configuration.EventRetryTime) * time.Second)
+		// 	retries = 0
+		// }
 		//Ask simUe to just run procedure and return result
 		start_ts := time.Now() 
 		go RunProcedure(simUe, procedure)
@@ -200,13 +207,24 @@ func ImsiStateMachine(profile *profctx.Profile, pCtx *profctx.ProfileUeContext, 
 			err = fmt.Errorf("imsi:%v, profile timeout", imsiStr)
 			pCtx.Log.Infoln("Procedure Result: FAIL,", err)
 			proc_fail = true
+		// case <-retryTicker.C:
+		// 	pCtx.Log.Infoln("imsiStateMachine retrying procedure")
+		// 	if retries < 20 { //profile.RetryCount {
+		// 		retries++
+		// 		go RunProcedure(simUe, procedure)
+		// 	} else {
+		// 		err = fmt.Errorf("imsi:%v, profile retry count exceeded", imsiStr)
+		// 		pCtx.Log.Infoln("Procedure Result: FAIL,", err)
+		// 		proc_fail = true
+		// 	}
+
 		case msg := <-pCtx.ReadChan:
 			pCtx.Log.Infoln("imsiStateMachine received result ")
 			switch msg.Event {
 			case common.PROC_PASS_EVENT:
 				end_ts := time.Now()
 				diff := end_ts.Sub(start_ts)
-				fmt.Printf("[LOG][E2E],%v,%v,%v,%v,%v,%v,%v,%v,pass\n", msg.Supi,start_ts.Unix(),end_ts.Unix(), start_ts.UnixNano(), end_ts.UnixNano(), diff.Milliseconds(),end_ts.Format("15:04:05"), procedure)
+				fmt.Printf("[LOG][E2E],%v,%v,%v,%v,%v,%v,%v,%v,pass\n", msg.Supi, start_ts.Unix(), end_ts.Unix(), start_ts.UnixNano(), end_ts.UnixNano(), diff.Milliseconds(), end_ts.Format("15:04:05"), procedure)
 				time.Sleep(1 * time.Millisecond)
 			
 				pCtx.Log.Infoln("Procedure Result: PASS, imsi:", msg.Supi)
@@ -217,7 +235,7 @@ func ImsiStateMachine(profile *profctx.Profile, pCtx *profctx.ProfileUeContext, 
 			case common.PROC_FAIL_EVENT:
 				end_ts := time.Now()
 				diff := end_ts.Sub(start_ts)
-				fmt.Printf("[LOG][E2E],%v,%v,%v,%v,%v,%v,%v,%v,fail\n", msg.Supi,start_ts.Unix(),end_ts.Unix(), start_ts.UnixNano(), end_ts.UnixNano(), diff.Milliseconds(),end_ts.Format("15:04:05"), procedure)
+				fmt.Printf("[LOG][E2E],%v,%v,%v,%v,%v,%v,%v,%v,fail\n", msg.Supi, start_ts.Unix(), end_ts.Unix(), start_ts.UnixNano(), end_ts.UnixNano(), diff.Milliseconds(), end_ts.Format("15:04:05"), procedure)
 				time.Sleep(1 * time.Millisecond)
  
 				err = fmt.Errorf("imsi:%v, procedure:%v, error:%v", msg.Supi, msg.Proc, msg.Error)
@@ -226,6 +244,7 @@ func ImsiStateMachine(profile *profctx.Profile, pCtx *profctx.ProfileUeContext, 
 			}
 		}
 		ticker.Stop()
+		// retryTicker.Stop()
 		if no_more_proc == true {
 			pCtx.Log.Infoln("imsiStateMachine no more proc to execute")
 			break

@@ -122,6 +122,7 @@ func init() {
 
 var srvreq_delays []Delay
 var s1release_delays []Delay
+var simulationTime time.Duration
 
 func read_csv_file(file string) []Delay {
 	fmt.Println(" in read_csv_file() local logic of sleep time..", file)
@@ -150,14 +151,19 @@ func read_csv_file(file string) []Delay {
 	return delays
 }
 
-func (profile *Profile) Load_csv_vars(srvreq_csv_file, s1release_csv_file string) {
+func (profile *Profile) Load_csv_vars(srvreq_csv_file, s1release_csv_file, realTraceSimulationTime string) {
 	// srvreq_csv_file := "/root/ECM_IDLE-L_SRV_REQ.csv"
 	// s1release_csv_file := "/root/ECM_CONNECTED-L_S1_CONN_REL.csv"
 	fmt.Println(" in Load_csv_vars() ..", srvreq_csv_file, s1release_csv_file)
-	if profile.Enable {
-		srvreq_delays = read_csv_file(srvreq_csv_file)
-		s1release_delays = read_csv_file(s1release_csv_file)
-		rand.Seed(41)
+	srvreq_delays = read_csv_file(srvreq_csv_file)
+	s1release_delays = read_csv_file(s1release_csv_file)
+	rand.Seed(41)
+	if realTraceSimulationTime == "sec" {
+		simulationTime = time.Second
+	} else if realTraceSimulationTime == "micro" {
+		simulationTime = time.Microsecond
+	} else if realTraceSimulationTime == "mili" {
+		simulationTime = time.Millisecond
 	}
 }
 
@@ -280,7 +286,7 @@ func delayFunction(file string, t string, rand_bool bool) { // filename, "CSV", 
 	idx := rand.Intn(len)
 	delay_val := delays[idx].value
 	fmt.Printf("delay idx: %v, value: %v sec, type: %t\n", idx, delay_val, delay_val)
-	time.Sleep(time.Duration(delay_val) * time.Millisecond)
+	time.Sleep(time.Duration(delay_val) * simulationTime)
 }
 
 func (p *Profile) GetNextEvent(Procedure common.ProcedureType, currentEvent common.EventType) (common.EventType, error) {

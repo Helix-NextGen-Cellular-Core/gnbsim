@@ -35,8 +35,9 @@ const (
 func InitializeAllProfiles() {
 	for _, profile := range factory.AppConfig.Configuration.Profiles {
 		profile.Init()
-		if factory.AppConfig.Configuration.RealTrace {
-			profile.Load_csv_vars(factory.AppConfig.Configuration.RealTraceFileSR, factory.AppConfig.Configuration.RealTraceFileS1)
+		if factory.AppConfig.Configuration.RealTrace && profile.Enable {
+			profile.Load_csv_vars(factory.AppConfig.Configuration.RealTraceFileSR, factory.AppConfig.Configuration.RealTraceFileS1,
+				factory.AppConfig.Configuration.RealTraceSimulationTime)
 		}
 	}
 	initProcedureEventMap()
@@ -145,7 +146,9 @@ func ExecuteProfile(profile *profctx.Profile, summaryChan chan common.InterfaceM
 	fmt.Printf("Current: \t%v\nStartAt: \t%v\n", currentTime, startTime)
 	fmt.Printf("Sleeping for %v\n", duration.Round(time.Second).Seconds())
 
-	time.Sleep(duration)
+	if !factory.AppConfig.Configuration.PauseAtStart { // default false
+		time.Sleep(duration)
+	}
 
 	go func() {
 		var plock sync.Mutex
