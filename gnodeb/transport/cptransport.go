@@ -23,6 +23,8 @@ import (
 // Need to check if NGAP may exceed this limit
 var MAX_SCTP_PKT_LEN int = 2048
 
+// var MAX_SCTP_PKT_LEN int = 131072
+
 //TODO: Should have a context variable which when cancelled will result in
 // the termination of the ReceiveFromPeer handler
 
