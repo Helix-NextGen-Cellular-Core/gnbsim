@@ -23,8 +23,6 @@ import (
 // Need to check if NGAP may exceed this limit
 var MAX_SCTP_PKT_LEN int = 2048
 
-// var MAX_SCTP_PKT_LEN int = 131072
-
 //TODO: Should have a context variable which when cancelled will result in
 // the termination of the ReceiveFromPeer handler
 
@@ -34,6 +32,11 @@ type GnbCpTransport struct {
 
 	/* logger */
 	Log *logrus.Entry
+}
+
+type message struct {
+	buf []byte
+	// start_time time.Time
 }
 
 func NewGnbCpTransport(gnb *gnbctx.GNodeB) *GnbCpTransport {
@@ -144,6 +147,18 @@ func (cpTprt *GnbCpTransport) ReceiveFromPeer(peer transportcommon.TransportPeer
 
 	}()
 
+	channelSize := 10000
+	var handleMessageChan chan message
+	handleMessageChan = make(chan message, channelSize)
+	cpTprt.Log.Infoln("Channel created with size:", channelSize)
+
+	go func() {
+		for {
+			msg := <-handleMessageChan
+			gnbamfworker.HandleMessage(cpTprt.GnbInstance, amf, msg.buf)
+		}
+	}()
+
 	conn := amf.Conn.(*sctp.SCTPConn)
 	for {
 		recvMsg := make([]byte, MAX_SCTP_PKT_LEN)
@@ -168,7 +183,8 @@ func (cpTprt *GnbCpTransport) ReceiveFromPeer(peer transportcommon.TransportPeer
 
 		cpTprt.Log.Infof("Read %v bytes from %v\n", n, amf.GetIpAddr())
 		//TODO Post to gnbamfworker channel
-		gnbamfworker.HandleMessage(cpTprt.GnbInstance, amf, recvMsg[:n])
+		handleMessageChan <- message{buf: recvMsg[:n]}
+		// gnbamfworker.HandleMessage(cpTprt.GnbInstance, amf, recvMsg[:n])
 	}
 }
 
