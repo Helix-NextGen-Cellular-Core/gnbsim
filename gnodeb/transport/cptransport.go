@@ -148,8 +148,8 @@ func (cpTprt *GnbCpTransport) ReceiveFromPeer(peer transportcommon.TransportPeer
 	}()
 
 	channelSize := 10000
-	var handleMessageChan chan message
-	handleMessageChan = make(chan message, channelSize)
+	// var handleMessageChan chan message
+	handleMessageChan := make(chan message, channelSize)
 	cpTprt.Log.Infoln("Channel created with size:", channelSize)
 
 	go func() {
