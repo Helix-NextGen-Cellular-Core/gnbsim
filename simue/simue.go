@@ -199,7 +199,7 @@ func ImsiStateMachine(profile *profctx.Profile, pCtx *profctx.ProfileUeContext, 
 		// 	retries = 0
 		// }
 		//Ask simUe to just run procedure and return result
-		start_ts := time.Now() 
+		start_ts := time.Now()
 		go RunProcedure(simUe, procedure)
 		pCtx.Log.Infoln("Waiting for procedure result from imsiStateMachine")
 		select {
@@ -226,7 +226,7 @@ func ImsiStateMachine(profile *profctx.Profile, pCtx *profctx.ProfileUeContext, 
 				diff := end_ts.Sub(start_ts)
 				fmt.Printf("[LOG][E2E],%v,%v,%v,%v,%v,%v,%v,%v,pass\n", msg.Supi, start_ts.Unix(), end_ts.Unix(), start_ts.UnixNano(), end_ts.UnixNano(), diff.Milliseconds(), end_ts.Format("15:04:05"), procedure)
 				time.Sleep(1 * time.Millisecond)
-			
+
 				pCtx.Log.Infoln("Procedure Result: PASS, imsi:", msg.Supi)
 				procedure = profile.GetNextProcedure(pCtx, simUe.Procedure)
 				if procedure == 0 {
@@ -237,7 +237,7 @@ func ImsiStateMachine(profile *profctx.Profile, pCtx *profctx.ProfileUeContext, 
 				diff := end_ts.Sub(start_ts)
 				fmt.Printf("[LOG][E2E],%v,%v,%v,%v,%v,%v,%v,%v,fail\n", msg.Supi, start_ts.Unix(), end_ts.Unix(), start_ts.UnixNano(), end_ts.UnixNano(), diff.Milliseconds(), end_ts.Format("15:04:05"), procedure)
 				time.Sleep(1 * time.Millisecond)
- 
+
 				err = fmt.Errorf("imsi:%v, procedure:%v, error:%v", msg.Supi, msg.Proc, msg.Error)
 				pCtx.Log.Infoln("Result: FAIL,", err)
 				proc_fail = true

@@ -184,6 +184,9 @@ func (cpTprt *GnbCpTransport) ReceiveFromPeer(peer transportcommon.TransportPeer
 		cpTprt.Log.Infof("Read %v bytes from %v\n", n, amf.GetIpAddr())
 		//TODO Post to gnbamfworker channel
 		handleMessageChan <- message{buf: recvMsg[:n]}
+		// if len(handleMessageChan) > 3 {
+		// 	cpTprt.Log.Errorln("Channel length:", len(handleMessageChan))
+		// }
 		// gnbamfworker.HandleMessage(cpTprt.GnbInstance, amf, recvMsg[:n])
 	}
 }
