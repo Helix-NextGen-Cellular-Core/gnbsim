@@ -34,6 +34,7 @@ var (
 	GinLog        *logrus.Entry
 	HttpLog       *logrus.Entry
 	ProfUeCtxLog  *logrus.Entry
+	NasMsgLog     *logrus.Entry
 )
 
 const (
@@ -97,6 +98,7 @@ func init() {
 	GtpLog = UtilLog.WithField("subcategory", "GTP")
 	NgapLog = UtilLog.WithField("subcategory", "NGAP")
 	PsuppLog = UtilLog.WithField("subcategory", "PSUPP")
+	NasMsgLog = UtilLog.WithField("subcategory", "NASMSG")
 }
 
 func SetLogLevel(level string) {

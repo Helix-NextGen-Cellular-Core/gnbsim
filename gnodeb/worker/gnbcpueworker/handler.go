@@ -342,7 +342,7 @@ func HandleDataBearerSetupResponse(gnbue *gnbctx.GnbCpUe,
 	for _, item := range msg.DBParams {
 		pduSess := item.PduSess
 		if !pduSess.Success {
-			fmt.Println("pduSess.Success ", pduSess.PduSessId, pduSess.Success, "removing from gnbue\n")
+			gnbue.Log.Warnln("pduSess.Success ", pduSess.PduSessId, pduSess.Success, "removing from gnbue\n")
 			gnbue.RemoveGnbUpUe(pduSess.PduSessId)
 		} else {
 			gnbUpUe, err := gnbue.GetGnbUpUe(pduSess.PduSessId)
@@ -542,6 +542,8 @@ func ProcessPduSessResourceSetupList(gnbue *gnbctx.GnbCpUe,
 			gnbue.Log.Errorln("ID Generator Allocate() returned:", err)
 			return
 		}
+		// gtpTunnel.TransportLayerAddress.Value.BitLength = 32
+		// fmt.Println("gtpTunnel.TransportLayerAddress: ", gtpTunnel.TransportLayerAddress)
 		upfIp, _ := ngapConvert.IPAddressToString(gtpTunnel.TransportLayerAddress)
 
 		gnbupue := gnbctx.NewGnbUpUe(uint32(dlteid), ulteid, gnbue.Gnb)

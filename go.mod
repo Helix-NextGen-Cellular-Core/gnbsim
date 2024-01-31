@@ -2,6 +2,8 @@ module github.com/omec-project/gnbsim
 
 go 1.18
 
+replace github.com/omec-project/nas => ../nas
+
 require (
 	git.cs.nctu.edu.tw/calee/sctp v1.1.0
 	github.com/antonfisher/nested-logrus-formatter v1.3.1

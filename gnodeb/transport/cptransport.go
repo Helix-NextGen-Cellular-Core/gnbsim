@@ -151,13 +151,15 @@ func (cpTprt *GnbCpTransport) ReceiveFromPeer(peer transportcommon.TransportPeer
 	// var handleMessageChan chan message
 	handleMessageChan := make(chan message, channelSize)
 	cpTprt.Log.Infoln("Channel created with size:", channelSize)
-
-	go func() {
-		for {
-			msg := <-handleMessageChan
-			gnbamfworker.HandleMessage(cpTprt.GnbInstance, amf, msg.buf)
-		}
-	}()
+	processingThreadSize := 256
+	for i := 0; i < processingThreadSize; i++ {
+		go func() {
+			for {
+				msg := <-handleMessageChan
+				gnbamfworker.HandleMessage(cpTprt.GnbInstance, amf, msg.buf)
+			}
+		}()
+	}
 
 	conn := amf.Conn.(*sctp.SCTPConn)
 	for {

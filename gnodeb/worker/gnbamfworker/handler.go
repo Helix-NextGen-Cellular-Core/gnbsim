@@ -436,6 +436,7 @@ func HandleUeCtxReleaseCommand(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf,
 		return
 	}
 
+	// fmt.Println("ueCtxRelCmd.ProtocolIEs.List:", ueCtxRelCmd.ProtocolIEs.List)
 	for _, ie := range ueCtxRelCmd.ProtocolIEs.List {
 		switch ie.Id.Value {
 		case ngapType.ProtocolIEIDUENGAPIDs:
@@ -447,6 +448,11 @@ func HandleUeCtxReleaseCommand(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf,
 			break
 		}
 	}
+	// fmt.Println("ueNgapIds:", ueNgapIds)
+	// fmt.Println("ueNgapIds.Present:", ueNgapIds.Present)
+	// fmt.Println("ngapType.UENGAPIDsPresentUENGAPIDPair:", ngapType.UENGAPIDsPresentUENGAPIDPair)
+	// fmt.Println("ueNgapIds.UENGAPIDPair:", ueNgapIds.UENGAPIDPair)
+	// fmt.Println("ueNgapIds.UENGAPIDPair.RANUENGAPID:", ueNgapIds.UENGAPIDPair.RANUENGAPID)
 
 	if ueNgapIds.Present == ngapType.UENGAPIDsPresentUENGAPIDPair {
 		ranUeNgapId = &ueNgapIds.UENGAPIDPair.RANUENGAPID
@@ -459,6 +465,7 @@ func HandleUeCtxReleaseCommand(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf,
 		amf.Log.Errorln("No RANUENGAPID received")
 	}
 
+	// fmt.Println("ranUeNgapId:", ranUeNgapId)
 	ngapId := ranUeNgapId.Value
 	gnbue := gnb.GnbUes.GetGnbCpUe(ngapId)
 	if gnbue == nil {
