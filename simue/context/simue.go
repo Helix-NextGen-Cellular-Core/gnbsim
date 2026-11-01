@@ -46,9 +46,6 @@ type SimUe struct {
 
 	/* logger */
 	Log *logrus.Entry
-
-	/* Message response received */
-	MsgRspReceived chan bool
 }
 
 var SimUeTable map[string]*SimUe
@@ -69,7 +66,6 @@ func NewSimUe(supi string, gnb *gnbctx.GNodeB, profile *profctx.Profile, result 
 	simue.Log = logger.SimUeLog.WithField(logger.FieldSupi, supi)
 
 	simue.Log.Traceln("Created new SimUe context")
-	simue.MsgRspReceived = make(chan bool, 5)
 	SimUeTable[supi] = &simue
 	return &simue
 }

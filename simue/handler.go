@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/omec-project/gnbsim/common"
-	"github.com/omec-project/gnbsim/factory"
 	simuectx "github.com/omec-project/gnbsim/simue/context"
 )
 
@@ -310,25 +309,6 @@ func HandleDataPktGenFailureEvent(ue *simuectx.SimUe,
 	return nil
 }
 
-func retransmitMsg(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage, count int) {
-	// TBD: Profile should give timeout and number of retransmission as input
-	ticker := time.NewTicker(time.Duration(factory.AppConfig.Configuration.EventRetryTime) * time.Millisecond)
-	for {
-		select {
-		case <-ue.MsgRspReceived:
-			ue.Log.Traceln("Received Service Accept Message ")
-			ticker.Stop()
-			return
-		case <-ticker.C:
-			if count > 0 {
-				ue.Log.Traceln("Resend Service Request count ", count)
-				SendToGnbUe(ue, intfcMsg)
-				count = count - 1
-			}
-		}
-	}
-}
-
 func HandleServiceRequestEvent(ue *simuectx.SimUe,
 	intfcMsg common.InterfaceMessage) (err error) {
 
@@ -338,18 +318,14 @@ func HandleServiceRequestEvent(ue *simuectx.SimUe,
 	// }
 
 	SendToGnbUe(ue, intfcMsg)
-	if factory.AppConfig.Configuration.EventRetry == true {
-		go retransmitMsg(ue, intfcMsg, 25)
-	}
+
 	ue.Log.Traceln("Sent Service Request Event to the network")
 	return nil
 }
 
 func HandleServiceAcceptEvent(ue *simuectx.SimUe,
 	intfcMsg common.InterfaceMessage) (err error) {
-	if factory.AppConfig.Configuration.EventRetry == true {
-		ue.MsgRspReceived <- true // feedback loop
-	}
+
 	err = ue.ProfileCtx.CheckCurrentEvent(ue.Procedure, common.SERVICE_REQUEST_EVENT,
 		intfcMsg.GetEventType())
 	if err != nil {
