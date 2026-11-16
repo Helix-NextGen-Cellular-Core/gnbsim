@@ -352,10 +352,7 @@ func HandleDataBearerSetupResponse(gnbue *gnbctx.GnbCpUe,
 			// TODO: Addition to this map should only be through GnbUpfWorker
 			// routine. This will help in replacing sync map with normal map
 			// Thus will help avoid lock unlock operation on per downlink message
-			// fmt.Println("gnbUpUe %v\n", gnbUpUe)
 			if gnbUpUe != nil {
-				// fmt.Println("pduSess.PduSessId %v gnbUpUe %v \n", pduSess.PduSessId, gnbUpUe)
-				// fmt.Println("gnbUpUe.DlTeid %v \n", gnbUpUe.DlTeid)
 				gnbUpUe.Upf.GnbUpUes.AddGnbUpUe(gnbUpUe.DlTeid, true, gnbUpUe)
 				gnbUpUe.WriteUeChan = item.CommChan
 				gnbue.WaitGrp.Add(1)
@@ -542,8 +539,6 @@ func ProcessPduSessResourceSetupList(gnbue *gnbctx.GnbCpUe,
 			gnbue.Log.Errorln("ID Generator Allocate() returned:", err)
 			return
 		}
-		// gtpTunnel.TransportLayerAddress.Value.BitLength = 32
-		// fmt.Println("gtpTunnel.TransportLayerAddress: ", gtpTunnel.TransportLayerAddress)
 		upfIp, _ := ngapConvert.IPAddressToString(gtpTunnel.TransportLayerAddress)
 
 		gnbupue := gnbctx.NewGnbUpUe(uint32(dlteid), ulteid, gnbue.Gnb)
@@ -615,7 +610,6 @@ func ProcessPduSessResourceSetupList(gnbue *gnbctx.GnbCpUe,
 	/* TODO: To be fixed, currently Data Bearer Setup Event may get processed
 	 * before the pdu sessions are established on the UE side
 	 */
-	// time.Sleep(500 * time.Millisecond)
 	uemsg := common.UuMessage{}
 	uemsg.Event = common.DATA_BEARER_SETUP_REQUEST_EVENT
 	uemsg.DBParams = dbParamSet

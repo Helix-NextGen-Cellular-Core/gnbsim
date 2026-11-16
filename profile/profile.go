@@ -130,9 +130,6 @@ func ExecuteProfile(profile *profctx.Profile, summaryChan chan common.InterfaceM
 		summaryChan <- summary
 	}()
 
-	// startingTime := time.Now().Add(1 * time.Minute)
-	// time.Sleep(startingTime.Sub(time.Now()))
-
 	var currentTime = time.Now()
 	var startTime = currentTime.Truncate(time.Minute).Add(time.Minute)
 	var duration = startTime.Sub(currentTime)
@@ -196,7 +193,6 @@ func ExecuteProfile(profile *profctx.Profile, summaryChan chan common.InterfaceM
 		if !factory.AppConfig.Configuration.StartUeatOnce {
 			time.Sleep(time.Second * time.Duration(factory.AppConfig.Configuration.StartImsiDelay))
 		}
-		// time.Sleep(time.Millisecond * 500)
 		imsiStr := "imsi-" + strconv.Itoa(imsi)
 		imsi++
 		wg.Add(1)

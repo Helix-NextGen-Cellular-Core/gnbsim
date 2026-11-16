@@ -171,14 +171,10 @@ func HandleDeregAcceptEvent(ue *simuectx.SimUe,
 func HandlePduSessEstRequestEvent(ue *simuectx.SimUe,
 	intfcMsg common.InterfaceMessage) (err error) {
 
-	// msg := intfcMsg.(*common.UuMessage)
-	// msg.Event = common.UL_INFO_TRANSFER_EVENT
-	// SendToGnbUe(ue, msg)
 	// FOr Autosacling fix
 	if _, ok := intfcMsg.(*common.UeMessage); ok {
 		fmt.Printf("HandlePduSessEstRequestEvent: Got *common.UeMessage expected *common.UuMessage \n")
 	} else if uuMsg, ok := intfcMsg.(*common.UuMessage); ok {
-		// msg := intfcMsg.(*common.UuMessage)
 		uuMsg.Event = common.UL_INFO_TRANSFER_EVENT
 		SendToGnbUe(ue, uuMsg)
 	}
@@ -331,11 +327,6 @@ func retransmitMsg(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage, count i
 
 func HandleServiceRequestEvent(ue *simuectx.SimUe,
 	intfcMsg common.InterfaceMessage) (err error) {
-
-	// err = ConnectToGnb(ue)
-	// if err != nil {
-	// 	return fmt.Errorf("failed to connect gnb %v:", err)
-	// }
 
 	SendToGnbUe(ue, intfcMsg)
 	if factory.AppConfig.Configuration.EventRetry == true {

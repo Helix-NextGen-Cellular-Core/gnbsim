@@ -216,9 +216,6 @@ func (c *Config) Validate() (err error) {
 				c.Configuration.CustomProfiles["customProfiles"+strconv.Itoa(v)])
 		}
 
-		//    for _, v := range c.Configuration.CustomProfiles {
-		//    	c.Configuration.Profiles = append(c.Configuration.Profiles, v)
-		//    }
 	}
 
 	return nil

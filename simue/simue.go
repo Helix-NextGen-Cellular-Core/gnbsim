@@ -192,12 +192,6 @@ func ImsiStateMachine(profile *profctx.Profile, pCtx *profctx.ProfileUeContext, 
 		// proc result -  success, fail or timeout
 		timeout := time.Duration(profile.PerUserTimeout) * time.Second
 		ticker := time.NewTicker(timeout)
-		// retryTicker := time.NewTicker(100 * time.Second) // hack if retry is not enabled
-		// retries := 0
-		// if factory.AppConfig.Configuration.EventRetry == true {
-		// 	retryTicker = time.NewTicker(time.Duration(factory.AppConfig.Configuration.EventRetryTime) * time.Second)
-		// 	retries = 0
-		// }
 		//Ask simUe to just run procedure and return result
 		start_ts := time.Now()
 		go RunProcedure(simUe, procedure)
@@ -207,16 +201,6 @@ func ImsiStateMachine(profile *profctx.Profile, pCtx *profctx.ProfileUeContext, 
 			err = fmt.Errorf("imsi:%v, profile timeout", imsiStr)
 			pCtx.Log.Infoln("Procedure Result: FAIL,", err)
 			proc_fail = true
-		// case <-retryTicker.C:
-		// 	pCtx.Log.Infoln("imsiStateMachine retrying procedure")
-		// 	if retries < 20 { //profile.RetryCount {
-		// 		retries++
-		// 		go RunProcedure(simUe, procedure)
-		// 	} else {
-		// 		err = fmt.Errorf("imsi:%v, profile retry count exceeded", imsiStr)
-		// 		pCtx.Log.Infoln("Procedure Result: FAIL,", err)
-		// 		proc_fail = true
-		// 	}
 
 		case msg := <-pCtx.ReadChan:
 			pCtx.Log.Infoln("imsiStateMachine received result ")
@@ -244,7 +228,6 @@ func ImsiStateMachine(profile *profctx.Profile, pCtx *profctx.ProfileUeContext, 
 			}
 		}
 		ticker.Stop()
-		// retryTicker.Stop()
 		if no_more_proc == true {
 			pCtx.Log.Infoln("imsiStateMachine no more proc to execute")
 			break

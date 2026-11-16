@@ -148,7 +148,6 @@ func (cpTprt *GnbCpTransport) ReceiveFromPeer(peer transportcommon.TransportPeer
 	}()
 
 	channelSize := 10000
-	// var handleMessageChan chan message
 	handleMessageChan := make(chan message, channelSize)
 	cpTprt.Log.Infoln("Channel created with size:", channelSize)
 	processingThreadSize := 256
@@ -186,10 +185,6 @@ func (cpTprt *GnbCpTransport) ReceiveFromPeer(peer transportcommon.TransportPeer
 		cpTprt.Log.Infof("Read %v bytes from %v\n", n, amf.GetIpAddr())
 		//TODO Post to gnbamfworker channel
 		handleMessageChan <- message{buf: recvMsg[:n]}
-		// if len(handleMessageChan) > 3 {
-		// 	cpTprt.Log.Errorln("Channel length:", len(handleMessageChan))
-		// }
-		// gnbamfworker.HandleMessage(cpTprt.GnbInstance, amf, recvMsg[:n])
 	}
 }
 
