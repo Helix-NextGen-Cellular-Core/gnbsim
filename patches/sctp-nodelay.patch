@@ -1,0 +1,10 @@
+--- a/vendor/git.cs.nctu.edu.tw/calee/sctp/sctp_linux.go	2026-11-01 12:04:02.641332133 +0000
++++ b/vendor/git.cs.nctu.edu.tw/calee/sctp/sctp_linux.go	2026-11-01 12:04:02.641332133 +0000
+@@ -442,6 +442,7 @@
+ 			return nil, err
+ 		}
+ 	}
++	err = syscall.SetsockoptInt(sock, SOL_SCTP, SCTP_NODELAY, 1)
+ 	_, err = SCTPConnect(sock, raddr)
+ 	if err != nil {
+ 		return nil, err

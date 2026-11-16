@@ -1,22 +1,16 @@
-# Copyright 2021-present Open Networking Foundation
-#
-# SPDX-License-Identifier: Apache-2.0
-#
+# Builds the Helix image ghcr.io/helix-nextgen-cellular-core/gnbsim:v1.0.0
+# the same way it was built and verified:
+#   docker build -t gnbsim:local .
+FROM golang:1.18.0-stretch AS builder
+WORKDIR /go/src/gnbsim
+COPY . .
+RUN go mod vendor \
+ && git apply patches/sctp-nodelay.patch \
+ && mkdir -p /out/gnbsim/bin && go build -mod=vendor -o /out/gnbsim/bin/gnbsim .
 
-FROM golang:1.18.0-stretch AS gnb
-
-LABEL maintainer="ONF <omec-dev@opennetworking.org>"
-RUN echo "deb http://archive.debian.org/debian stretch main" > /etc/apt/sources.list
-RUN apt-get update && apt-get -y install vim ethtool
-RUN cd $GOPATH/src && mkdir -p gnbsim
-COPY . $GOPATH/src/gnbsim 
-RUN cd $GOPATH/src/gnbsim && go build -mod=vendor
-
-FROM alpine:3.16 AS gnbsim
-RUN apk update && apk add -U gcompat vim strace net-tools curl netcat-openbsd bind-tools bash tcpdump
-
-RUN mkdir -p /gnbsim/bin
-
-# Copy executable
-COPY --from=gnb /go/src/gnbsim/gnbsim /gnbsim/bin/
+FROM alpine:3.16
+LABEL org.opencontainers.image.source="https://github.com/Helix-NextGen-Cellular-Core/gnbsim" \
+      org.opencontainers.image.licenses="Apache-2.0"
+RUN apk update && apk add -U vim strace net-tools curl netcat-openbsd bind-tools gcompat bash tcpdump
+COPY --from=builder /out/ /
 WORKDIR /gnbsim/bin
