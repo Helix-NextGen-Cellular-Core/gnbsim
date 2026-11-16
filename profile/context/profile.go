@@ -237,33 +237,7 @@ type Delay struct {
 	value int
 }
 
-// type files_rec struct {
-
-// }
-
 func delayFunction(file string, t string, rand_bool bool) { // filename, "CSV", true
-	// fmt.Println("local logic of sleep time..", file, t, rand_bool)
-
-	// f, err := os.Open(file)
-	// if err != nil {
-	// 	fmt.Println("Cannot open CSV file:", err)
-	// }
-	// defer f.Close()
-
-	// reader := csv.NewReader(f)
-	// rows, err := reader.ReadAll()
-	// if err != nil {
-	// 	fmt.Println("Cannot read CSV file:", err)
-	// }
-	// var delays []Delay
-	// for _, row := range rows {
-	//   val, _ := strconv.ParseFloat(row[0], 32)
-	//   del := Delay{
-	// 	value: int(val),
-	//   }
-	//   delays = append(delays, del)
-	// }
-	// fmt.Println(delays)
 
 	var delays []Delay
 	if strings.Contains(file, "S1_CONN_REL") {
@@ -361,7 +335,6 @@ func (p *Profile) GetNextProcedure(pCtx *ProfileUeContext, currentProcedure comm
 		itp, found := p.PIterations[pCtx.CurrentItr]
 		pCtx.Log.Infoln("Current Iteration map - ", itp)
 		if itp.WaitMap[pCtx.CurrentProcIndex] != 0 {
-			// time.Sleep(time.Second * time.Duration(itp.WaitMap[pCtx.CurrentProcIndex]))
 			time.Sleep(time.Millisecond * time.Duration(itp.WaitMap[pCtx.CurrentProcIndex]))
 		} else if itp.WaitDistMap[pCtx.CurrentProcIndex] != nil {
 			d := itp.WaitDistMap[pCtx.CurrentProcIndex]

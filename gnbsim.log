@@ -1,5 +1,0 @@
-time="2023-08-02T08:13:02Z" level=info msg="App Name: GNBSIM" category=App component=GNBSIM
-time="2023-08-02T08:13:02Z" level=warning msg="No configuration file provided. Using default configuration file: /gnbsim/config/gnb.conf" category=App component=GNBSIM
-time="2023-08-02T08:13:02Z" level=info msg="Application Usage: ./gnbsim --cfg [gnbsim configuration file]" category=App component=GNBSIM
-time="2023-08-02T08:13:02Z" level=error msg="Failed to initialize config factory: open /gnbsim/config/gnb.conf: no such file or directory" category=App component=GNBSIM
-time="2023-08-02T08:13:02Z" level=error msg="Failed to run GNBSIM: open /gnbsim/config/gnb.conf: no such file or directory" category=App component=GNBSIM
