@@ -2,7 +2,7 @@ module github.com/omec-project/gnbsim
 
 go 1.18
 
-replace github.com/omec-project/nas => ../nas
+replace github.com/omec-project/nas => github.com/Helix-NextGen-Cellular-Core/nas v1.0.0
 
 require (
 	git.cs.nctu.edu.tw/calee/sctp v1.1.0
